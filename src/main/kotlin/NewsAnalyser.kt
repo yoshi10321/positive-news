@@ -6,8 +6,12 @@ import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
 import org.w3c.dom.Element
 import org.xml.sax.InputSource
+import twitter4j.StatusUpdate
+import twitter4j.TwitterFactory
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
+
+const val TWEET_LIMIT = 10
 
 fun main() {
 
@@ -67,10 +71,21 @@ fun analyseSentiment(text: String): Float? {
 }
 
 fun tweetPositiveNews(list: List<News>) {
-    list.forEach {
-        val score = analyseSentiment(it.title)?: return@forEach
-        if (score >= 0.1) {
-            println("tweet!! ${it.title}")
+    val twitter = TwitterFactory.getSingleton()
+
+    var tweetCount = 0
+    list.forEachIndexed { index, news ->
+        if (tweetCount >= TWEET_LIMIT) return
+
+        val score = analyseSentiment(news.title)?: return@forEachIndexed
+        if (score >= 0.2) {
+            println("tweet!! ${news.title}")
+            val status = StatusUpdate("""
+                ${news.title}
+                ${news.link}
+            """.trimIndent())
+            twitter.updateStatus(status)
+            tweetCount++
         }
     }
 }
