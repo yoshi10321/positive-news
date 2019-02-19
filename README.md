@@ -1,0 +1,2 @@
+- ローカル開発時、intelliJで実行する時はRun ConfigurationのEnvironment VariablesにGOOGLE_APPLICATION_CREDENTIALSの設定を追加する
+- twitter4j.propertiesファイルをresourcesに配置する
