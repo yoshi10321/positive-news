@@ -94,10 +94,10 @@ class NewsDelivery: RequestHandler<Request,Response>{
             if (tweetCount >= TWEET_LIMIT) return
 
             val score = analyseSentiment(news.title)?: return@forEachIndexed
-            if (score >= 0.2) {
+            if (score >= 0.4) {
                 println("tweet!! ${news.title}")
                 val status = StatusUpdate("""
-                ${news.title}
+                ポジティブ度${score*10} ${news.title}
                 ${news.link}
             """.trimIndent())
                 twitter.updateStatus(status)
