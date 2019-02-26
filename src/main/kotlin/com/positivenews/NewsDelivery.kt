@@ -22,6 +22,10 @@ fun main() {
 }
 
 class NewsDelivery: RequestHandler<Request,Response>{
+    companion object {
+        val BAN_WORDS = arrayOf("死亡","心中")
+    }
+
     override fun handleRequest(input: Request?, context: Context?): Response {
         delivery()
         return Response()
@@ -93,12 +97,15 @@ class NewsDelivery: RequestHandler<Request,Response>{
         list.forEachIndexed { index, news ->
             if (tweetCount >= TWEET_LIMIT) return
 
+            BAN_WORDS.forEach { if (news.title.contains(it)) return@forEachIndexed }
+
             val score = analyseSentiment(news.title)?: return@forEachIndexed
             if (score >= 0.4) {
                 println("tweet!! ${news.title}")
                 val status = StatusUpdate("""
-                ポジティブ度${score*10} ${news.title}
-                ${news.link}
+                    ${news.title}
+                    ポジティブ度${score*10}
+                    ${news.link}
             """.trimIndent())
                 twitter.updateStatus(status)
                 tweetCount++
